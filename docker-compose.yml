@@ -1,0 +1,102 @@
+# NOTE: every service image is `FROM gms-base`. Build the shared base first:
+#   ./build.sh            # builds gms-base, then all services
+# or manually:
+#   docker build -t gms-base -f gms-base.Dockerfile . && docker compose build
+# Then:  docker compose up -d
+services:
+  db:
+    image: mysql:8.0
+    container_name: gms-db
+    environment:
+      MYSQL_ROOT_PASSWORD: gms
+      MYSQL_DATABASE: gms
+      MYSQL_USER: gms
+      MYSQL_PASSWORD: gms
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3307:3306"   # host 3307 → container 3306 (avoids clashing with a local MySQL)
+    volumes:
+      - gms_db:/var/lib/mysql
+      # On first init, MySQL runs this: full schema (from the models/stage) + a
+      # sample seed (gym, location, owner/staff, plans, members, memberships,
+      # all reference data). Regenerate with scripts/seed_from_stage.py.
+      # Login after `docker compose up`:  owner@demo.gym / Test@1234
+      - ./gmsshared/db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-pgms"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  broker:
+    image: redis:7-alpine
+    container_name: gms-broker
+    # No host port mapping — services reach it as `broker:6379` on the compose network.
+    # (Avoids clashing with a Redis already running on the host's 6379.)
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  auth-admin-service:
+    build: { context: ., dockerfile: auth-admin-service/Dockerfile }
+    container_name: auth-admin-service
+    ports: ["5004:5004"]
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  members-service:
+    build: { context: ., dockerfile: members-service/Dockerfile }
+    container_name: members-service
+    ports: ["5005:5005"]
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  plans-classes-service:
+    build: { context: ., dockerfile: plans-classes-service/Dockerfile }
+    container_name: plans-classes-service
+    ports: ["5006:5006"]
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  reports-service:
+    build: { context: ., dockerfile: reports-service/Dockerfile }
+    container_name: reports-service
+    ports: ["5008:5008"]
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  email-worker:
+    build: { context: ., dockerfile: email-worker/Dockerfile }
+    container_name: email-worker
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  batch-worker:
+    build: { context: ., dockerfile: batch-worker/Dockerfile }
+    container_name: batch-worker
+    env_file: ".env"
+    depends_on:
+      db: { condition: service_healthy }
+      broker: { condition: service_healthy }
+
+  scheduler:
+    build: { context: ., dockerfile: scheduler/Dockerfile }
+    container_name: scheduler
+    env_file: ".env"
+    depends_on:
+      broker: { condition: service_healthy }
+
+volumes:
+  gms_db:

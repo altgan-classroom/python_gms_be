@@ -1,0 +1,8 @@
+auth-admin-service
+members-service/src/members_service
+plans-classes-service
+reports-service/src/reports_service
+email-worker
+batch-worker
+scheduler
+gmsshared

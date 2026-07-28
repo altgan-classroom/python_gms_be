@@ -1,0 +1,9 @@
+# Dbmate docs https://github.com/amacneil/dbmate?tab=readme-ov-file
+
+LOCAL_DATABASE_URL="mysql://user:password@127.0.0.1:3306/gms"
+#DEV_DATABASE_URL="mysql://user:password@host:port/gms-dev"
+#TEST_DATABASE_URL="mysql://user:password@host:port/gms"
+#STAGE_DATABASE_URL="mysql://user:password@host:port/gms-stage"
+#PROD_DATABASE_URL="mysql://user:password@host:port/gms"
+
+DBMATE_NO_DUMP_SCHEMA=true

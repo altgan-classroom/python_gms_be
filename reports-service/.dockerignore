@@ -1,0 +1,8 @@
+dev.Dockerfile
+ci.Dockerfile
+Dockerfile
+Makefile
+**.idea**
+**tests**
+**auth_admin_service.egg-info**
+docker-compose.yml

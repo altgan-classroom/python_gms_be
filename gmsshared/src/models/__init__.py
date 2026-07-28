@@ -1,0 +1,2 @@
+class DoorAccessDoor:
+    pass

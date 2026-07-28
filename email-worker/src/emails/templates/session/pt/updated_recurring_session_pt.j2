@@ -1,0 +1,17 @@
+Hi {{ member_name }}
+
+We wanted to inform you of changes to your ongoing personal training sessions with Coach {{ coach_name }}! Here's what you need to know for your upcoming sessions:
+
+Next Session Date: {{ new_session_start_date }}
+
+Time: {{ new_session_start_time }}
+
+Your sessions are set to recur {{ weekday }} at {{ new_session_start_time }}. {%  if new_recurrence_end_date %} These sessions are scheduled to end on {{ new_recurrence_end_date }}. {% endif %}
+
+Be sure to login to your GO Member App account to view your sessions and add them to your calendar!
+
+Looking forward to seeing you soon for a great workout!
+
+Sincerely,
+
+The {{ gym_name }} Team

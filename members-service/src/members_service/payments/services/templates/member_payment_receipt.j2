@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <p>
+            {{ location.gym.name }} - {{ location.name }} <br>
+            {{ location.address_1 }} <br>
+            {{ location.address_2 }} <br>
+            {{ location.city }} <br>
+            {{ location.state }}, {{ location.zip }} <br>
+
+        <br>
+            Phone: {{ location.cs_phone }} <br>
+        <br>
+            First Name: {{ member.first_name }} <br>
+            Last Name: {{ member.last_name }} <br>
+        <br>
+            {% if pmt.refunds is defined %}
+            Original Transaction ID: {{ pmt.id }} <br>
+            Original Transaction Date: {{ pmt.processed_date }} <br>
+            {% else %}
+            Transaction ID: {{ pmt.id }} <br>
+            Transaction Date: {{ pmt.processed_date }} <br>
+            {% endif %} <br>
+        <br>
+            Payment Method: <br>
+            {% if pm.last_4_digits_card is not none %}
+                Last 4 digits of card: {{ pm.last_4_digits_card }}
+            {% else %}
+                Last 4 digits of Bank Account:
+                {{ pm.last_4_digits_account }}
+            {% endif %} <br>
+        <br>
+            Product Description: <br>
+            {% if pmt.membership_id is defined %}
+                Plan - {{ plan.name }}
+            {% else %}
+                Other
+            {% endif %} <br>
+        <br>
+            {% if pmt.signup_fee != 0 %}
+                Signup Fee: {{ pmt.signup_fee }}
+            {% endif %} <br>
+            Amount: {{ pmt.amount }} <br>
+            Discount: {{ pmt.discount }} <br>
+            Taxes: {{ pmt.tax }} <br>
+            Total: {{ pmt.total_amount }} <br>
+        <br>
+        <br>
+            {% if pmt.refunds is defined %}
+                {% for refund in pmt.refunds %}
+                    Refund Transaction ID: {{ refund.id }} <br>
+                    Refund Transaction Date: {{ refund.processed_date }} <br>
+                    <br>
+                    Refund Amount: ({{ refund.total_amount }}) <br>
+                    <br>
+                {% endfor %}
+            {% endif %} <br>
+        </p>
+    </body>
+</html>
