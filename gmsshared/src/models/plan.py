@@ -74,7 +74,7 @@ class Plan(db.Model):
     # A plan be of a Billing Type
     billing_type_id = Column(Integer, ForeignKey("_ref_billing_type.id"), nullable=False)
 
-    # If recurring plan, then define recurring duration TODO: deprecated. Using days always instead with recurring_interval
+    # If recurring plan, then define recurring duration
     recurring_duration_type_id = Column(Integer, ForeignKey("_ref_duration_type.id"), nullable=True, server_default="1")
 
     # If class or session packs plan, then define pass expiration duration

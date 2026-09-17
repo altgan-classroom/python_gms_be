@@ -135,7 +135,6 @@ def validate_plan_type(plan_types: str) -> Optional[List[int]]:
         return []
 
 
-# TODO: Remove this validator when refactoring reports-service
 def check_start_and_end_times(model: BaseModel) -> BaseModel:
     model_as_dict: dict = model.model_dump()
 
@@ -179,7 +178,6 @@ def get_timezone_offset(timezone: str) -> int:
     timezone_object = datetime.now(pytz.timezone(timezone))
     return int(timezone_object.utcoffset().total_seconds() / 60 / 60)
 
-# TODO: Figure out a way to combine this with the to_local() method. Remove duplicate
 def to_local_activity_history(value: date | datetime | str) -> datetime | str:
     local_timezone = pytz.timezone(get_timezone())
     utc_timezone = pytz.timezone('Etc/UTC')
@@ -220,7 +218,6 @@ def to_local(value: date | datetime | str) -> datetime | str:
     if value is None or isinstance(value, str):
         return value
 
-#TODO temporary, need to combine with to_local function
 def to_local_for_return_datetime_obj(value: datetime) -> datetime | None:
     local_timezone = pytz.timezone(get_timezone())
     utc_timezone = pytz.timezone('Etc/UTC')

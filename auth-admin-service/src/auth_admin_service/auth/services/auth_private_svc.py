@@ -21,7 +21,6 @@ from gmsshared.src.util.enums import RoleEnum, ResponseStatusEnum
 def get_user_info(user_id: int) -> Response:
     user = User.find_by_id(user_id)
     data = UserInfoResponse.model_validate(user, from_attributes=True).model_dump()
-    # TODO: At some remove this. Some users (like coaches etc) can be associate with multiple gyms
     if "impersonator" in g and g.impersonator is not None:
         impersonator = UserInfoResponse.model_validate(g.impersonator, from_attributes=True).model_dump()
         data["permissions"] = impersonator["permissions"]

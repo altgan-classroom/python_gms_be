@@ -43,7 +43,7 @@ class MemberPaymentHistory_v2(db.Model):
     payrix_disbursement_id = Column(String(50), nullable=True)
     payrix_transaction_status = Column(Integer, nullable=True)
     payrix_transaction_error = Column(String(500), nullable=True)
-    payrix_onboarding_status = Column(Integer, nullable=False, server_default='1') #TODO: Change this to _type_id and update everywhere it is used
+    payrix_onboarding_status = Column(Integer, nullable=False, server_default='1')
     notes = Column(String(250), nullable=True)
     v1_payment_id = Column(BigInteger, nullable=True)
 

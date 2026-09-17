@@ -21,8 +21,6 @@ from gmsshared.src.util.validators import (
 )
 
 
-# TODO: What does this do? Why even have this? Why are we returning the from_date and end_date back in the response.
-#  Clean this shit up and make it consistent with responses from other services
 class RecordsList(BaseModel):
     reports: List[dict]
     from_date: Annotated[datetime | str | None, AfterValidator(to_local)] = Field(

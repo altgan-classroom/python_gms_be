@@ -98,5 +98,14 @@ services:
     depends_on:
       broker: { condition: service_healthy }
 
+  # Static HTML/JS console. The browser calls the API containers directly on their host ports,
+  # so this container needs no build and no link to them. Edit ./frontend and refresh.
+  frontend:
+    image: nginx:alpine
+    container_name: gms-frontend
+    ports: ["8080:80"]
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+
 volumes:
   gms_db:

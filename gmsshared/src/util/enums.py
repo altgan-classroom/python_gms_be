@@ -291,7 +291,6 @@ class ContactTypeEnum(str, Enum):
     CLIENT = "Client"
     EXITED = "Exited"
 
-# TODO: Change the whole report naming convention and APIs. This is stupid.
 class SalesReportTypeEnum(str, Enum):
     # SALES
     NEW_MEMBERSHIP_SALES = "NEWSALES"

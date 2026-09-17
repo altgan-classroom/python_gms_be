@@ -137,7 +137,6 @@ def get_timespan(td):
         (total_seconds * 1000 * 1000 + milliseconds * 1000 + microseconds),
     )
 
-# TODO: Cleanup these usages
 def get_location_tzdata_and_timezone(location_id: int) -> (str, int):
     from gmsshared.src.models.location import Location
     from gmsshared.src.models._ref_timezone_type import _RefTimezoneType
@@ -145,7 +144,6 @@ def get_location_tzdata_and_timezone(location_id: int) -> (str, int):
     ref_timezone: _RefTimezoneType = _RefTimezoneType.find_by_id(location.timezone_type_id)
     return ref_timezone.iana_tzdata, ref_timezone.name
 
-# TODO: Cleanup these usages
 def utc_location_timezones(location_id: int):
     from pytz import timezone
     from pytz.tzinfo import StaticTzInfo
@@ -153,7 +151,6 @@ def utc_location_timezones(location_id: int):
     tzdata, _ = get_location_tzdata_and_timezone(location_id)
     return utc, timezone(tzdata)
 
-# TODO: Cleanup datetime conversions for reports
 def time_replace(time_to_replace: datetime, from_timezone, to_timezone) -> datetime | None:
     if time_to_replace is None:
         return None
@@ -162,7 +159,6 @@ def time_replace(time_to_replace: datetime, from_timezone, to_timezone) -> datet
     new_time = to_timezone.localize(output_timezone.replace(tzinfo=None))
     return new_time.replace(tzinfo=None)
 
-# TODO: Cleanup datetime conversions for reports
 def time_str_replace(time_str: str, from_timezone, to_timezone) -> str | None:
     if time_str is None:
         return None
@@ -177,12 +173,10 @@ def time_str_replace(time_str: str, from_timezone, to_timezone) -> str | None:
             return to_timezone.localize(output_timezone.replace(tzinfo=None)).strftime("%Y-%m-%d %H:%M")
         raise ValueError(f"Invalid date format {time_str} with error: {e}")
 
-# TODO: Cleanup these usages
 def convert_utc_to_location_time(location_id: int, utc_time: datetime) -> datetime | None:
     utc, location_timezone = utc_location_timezones(location_id)
     return time_replace(utc_time, utc, location_timezone)
 
-# TODO: Cleanup these usages
 def convert_utc_to_location_timestring(location_id: int, utc_timestring: str) -> str | None:
     utc, location_timezone = utc_location_timezones(location_id)
     return time_str_replace(utc_timestring, utc, location_timezone)

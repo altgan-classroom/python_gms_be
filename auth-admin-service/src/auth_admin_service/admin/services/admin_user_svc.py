@@ -50,7 +50,6 @@ def get_user_list(location_id: int, query: UserType) -> Response:
     )
 
 
-# TODO: Clean this up. Make it better with error handling
 def create_user(location_id: int, body: CreateUserRequest, skip_verification: bool = False) -> Response:
     message = "Created new user"
     user = User.find_by_email(body.email)
@@ -259,7 +258,6 @@ def _fill_staff_profile_info(profile: UserProfile, body: UpdateStaffProfileReque
 
 
 def _fill_user(user_profile: UserProfile, body: CreateUserRequest):
-    # TODO: Clean this up and make it generic
     for attr in body.model_dump().items():
         user_profile.__setattr__(attr[0], attr[1])
 
