@@ -6,11 +6,14 @@ sample slice of gms-stage-2 data.
   profiles, plans, and memberships.
 - Every seeded user's password -> Test@1234, verified + active.
   Login: owner@demo.gym / Test@1234
+- scripts/anonymize_seed.sql then replaces all personal and customer data with fictional values.
 
 Run in a service container:
-  docker compose run --rm --no-deps -v $PWD/scripts/seed_from_stage.py:/app/scripts/seed_from_stage.py \
+  docker compose run --rm --no-deps -v $PWD/scripts:/app/scripts \
     auth-admin-service python scripts/seed_from_stage.py
 """
+from pathlib import Path
+
 import mysql.connector
 from flask_bcrypt import Bcrypt
 
@@ -113,6 +116,12 @@ copy("user_location", where=f"WHERE user_id IN ({uid_list}) AND location_id IN (
 np = copy("plan", where=f"WHERE location_id IN ({loc_list})")
 nm = copy("membership", where=f"WHERE user_id IN ({uid_list}) AND location_id IN ({loc_list})", limit=MSHIP_LIMIT)
 print(f"plans: {np}, memberships: {nm}")
+
+for statement in (Path(__file__).parent / "anonymize_seed.sql").read_text().split(";\n"):
+    if statement.strip() and not all(line.startswith("--") for line in statement.strip().splitlines()):
+        tc.execute(statement)
+tgt.commit()
+print("personal data anonymized")
 
 tc.execute("SET FOREIGN_KEY_CHECKS=1")
 tgt.commit()

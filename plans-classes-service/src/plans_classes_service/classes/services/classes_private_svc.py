@@ -278,7 +278,6 @@ def update_class_info(location_id: int, body: UpdateClassRequest) -> Response:
     new = Class()
     # Can't change private_training to group or vice-versa
     fill_model(body, new, exclude=["plans", "class_access_groups"], ignore_nulls=True)
-    # TODO: Make this more efficient by getting all plans and loop through them rather than call each one separately
     new.plans = [Plan.find_by_id(plan_id) for plan_id in body.plans]
     new.class_access_groups = [ClassAccessGroup.find_by_id(location_id, group) for group in body.class_access_groups]
     new.private_training = old.private_training
@@ -423,7 +422,6 @@ def return_class_status(path: ClassPath, body: UpdateClassRequest) -> Response:
     new = Class()
 
     fill_model(body, new, exclude=["plans", "class_access_groups"], ignore_nulls=True)
-    # TODO: Make this more efficient by getting all plans and loop through them rather than call each one separately
     new.plans = [Plan.find_by_id(plan_id) for plan_id in body.plans]
     new.class_access_groups = [ClassAccessGroup.find_by_id(location_id=body.location_id, id=cag_id) for cag_id in body.class_access_groups]
 

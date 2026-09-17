@@ -110,14 +110,12 @@ def _is_plan_name_exist(location_id: int, body: CreatePlanRequest, plan_id=None)
 
 
 def _fill_plan(plan: Plan, body: CreatePlanRequest):
-    # TODO: Clean this up and make it generic
     for attr in body.dict().items():
         if attr[0] == "plan_types" or attr[0] == "location_permissions" or attr[0] == "class_access_groups":
             pass
         else:
             plan.__setattr__(attr[0], attr[1])
 
-    # TODO: Cleanup. Probably a better way to do this
     plan_type_ids = body.dict()["plan_types"]
     if plan_type_ids:
         plan_types = []
@@ -133,7 +131,6 @@ def _fill_plan(plan: Plan, body: CreatePlanRequest):
             class_access_groups.append(group)
     plan.class_access_groups = class_access_groups
 
-    # TODO: Do we still need this?
     plan_location_ids = body.dict()["location_permissions"]
     if plan_location_ids:
         plan_locations = []
@@ -179,7 +176,6 @@ def update_plan_info(location_id: int, plan_id: int, body: UpdatePlanRequest) ->
     )
 
 
-# TODO: Cleanup this check. Trying to delete should throw an exception which is enough to respond appropriately
 def delete_plan(location_id: int, plan_id: int) -> Response:
     class PlanMembers:
         active_member_count: int

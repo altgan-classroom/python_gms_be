@@ -95,7 +95,6 @@ class Membership(db.Model):
     def find_by_member_id(cls, location_id, member_id: int) -> List[Self]:
         return cls.query.filter_by(location_id=location_id, user_id=member_id).all()
 
-    # TODO: Refactor this query to SQLAlchemy QL
     @classmethod
     def find_by_membership_id(cls, location_id: int, user_id: int, membership_id: int) -> Optional[Self]:
         sql = (f"""SELECT 

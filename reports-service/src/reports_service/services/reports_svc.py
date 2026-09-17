@@ -125,7 +125,6 @@ def _get_sales_report(location_id: int, report: SalesReportTypeEnum, query: Repo
     elif report == SalesReportTypeEnum.NEW_MEMBERSHIP_SALES:
         response = __get_sales_new_sales_report(location_id, query)
     else:
-        # TODO: Move away from this format. Stick to the JSON data=[] format used in every other service.
         response = ReportsResponse(
             status_code=HTTPStatus,
             status=ResponseStatusEnum.NOT_IMPLEMENTED,
@@ -373,7 +372,6 @@ def __get_at_risk_attendance(location_id: int, query: ReportsQuery) -> ReportsRe
         last_sunday_at_midnite = last_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
         return to_utc(last_sunday_at_midnite)
 
-    # TODO: Clean this shit up. Use the validators or decorator functions
     def reports_time_to_local(at_risk_reports: List[dict]) -> None:
         for i in range(len(at_risk_reports)):
             last_attended: str | None = at_risk_reports[i]["last_attended_date"]
@@ -401,7 +399,6 @@ def __get_at_risk_attendance(location_id: int, query: ReportsQuery) -> ReportsRe
             {"reports": reports, "from_date": from_date, "to_date": datetime.utcnow()},
             from_attributes=True,
         )
-        # TODO: Remove to_location_time to to_local eventually
         response = ReportsResponse(
             status_code=HTTPStatus.OK,
             status=ResponseStatusEnum.FOUND,

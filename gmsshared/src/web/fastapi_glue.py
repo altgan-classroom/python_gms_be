@@ -16,6 +16,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
 
 from gmsshared import db
+from gmsshared.src.database import request_scope
 from gmsshared.src.util import validators
 from gmsshared.src.util.enums import ResponseStatusEnum, RoleEnum  # noqa: F401
 from gmsshared.src.util.exceptions import ApiUnauthorized, ApiForbidden
@@ -151,10 +152,12 @@ def install_session_middleware(app) -> None:
     @app.middleware("http")
     async def _session_per_request(request: Request, call_next):
         g.reset()
+        scope = request_scope.set(object())
         try:
             return await call_next(request)
         finally:
             db.session.remove()
+            request_scope.reset(scope)
 
 
 def install_exception_handlers(app) -> None:

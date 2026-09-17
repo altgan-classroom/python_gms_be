@@ -546,7 +546,6 @@ def get_report_embed_url_info(location_id: int, report_id: int) -> Response:
             message=f"Report {report_id} not found",
         )
 
-    # TODO: Make account, region and user config driven
     account_id = "843164030240"
     quicksight_user_name = get_config().QUICKSIGHT_USER_NAME
     try:

@@ -44,8 +44,9 @@ docker compose up -d           # MySQL + Redis + 4 API services + 3 async servic
 ```
 
 On first start, MySQL auto-loads **`gmsshared/db/init.sql`** — the full schema plus a sample seed
-(gym *"Hill Country Mecca"*, location 43, owner/staff + 40 members, 28 plans, 60 memberships, all
-reference data).
+(gym *"Riverside Strength"*, location 43, owner/staff + 40 members, 28 plans, 60 memberships, all
+reference data). Every name, address, contact detail and payment or door-access identifier in the seed is
+fictional; `scripts/anonymize_seed.sql` is applied whenever the seed is regenerated.
 
 **Login:** `owner@demo.gym` / `Test@1234` (every seeded user shares that password).
 
@@ -60,9 +61,63 @@ Health checks once up:
 
 Every API service serves interactive OpenAPI docs at **`/docs`** (and the raw spec at `/openapi.json`).
 
+### Web console (`frontend`, :8080)
+
+A small admin UI that drives the four API services from the browser: sign in, members and memberships,
+plans, the class schedule with bookings and check-in, staff, and reports. Its **Network** panel lists every
+HTTP call with the container that answered, the request headers and body, the response envelope, and a
+*Copy as curl* button.
+
+```bash
+docker compose up -d frontend   # then open http://localhost:8080
+```
+
+It is plain HTML, CSS and ES modules served by `nginx:alpine` from `./frontend` (no build step; edit and
+refresh). The browser calls each service directly on its host port, so start the API services too.
+`frontend/js/services/` has one file per container, and those files are the only place that knows URLs.
+
 > **Memory note:** the full fleet (9 containers) needs ~10–12 GB allocated to Docker Desktop. With less,
-> MySQL can be OOM-killed (exit 137). To run light, start only `db broker auth-admin-service members-service
-> plans-classes-service reports-service`.
+> MySQL can be OOM-killed (exit 137). To run light, start only the services you need (below).
+
+### Run only what you need
+
+You don't have to start the whole fleet. Every service declares `depends_on: db, broker` (with health
+checks), so **naming a service starts its infra automatically** and waits until MySQL + Redis are healthy
+before the service boots. Run `./build.sh` once first so the images exist.
+
+```bash
+# --- infra only (MySQL + Redis) ---
+docker compose up -d db broker
+
+# --- API services (each auto-starts db + broker) ---
+docker compose up -d auth-admin-service      # :5004  login / auth / admin
+docker compose up -d members-service         # :5005  members, memberships, bookings
+docker compose up -d plans-classes-service   # :5006  plans, classes, schedules
+docker compose up -d reports-service         # :5008  reports
+
+# --- async services (each auto-starts db + broker; scheduler needs broker only) ---
+docker compose up -d email-worker            # consumes the :emails queue
+docker compose up -d batch-worker            # consumes the :batch-queue queue
+docker compose up -d scheduler               # Celery Beat — emits cron tasks
+
+# --- combine any set; shared infra starts once, not per service ---
+docker compose up -d auth-admin-service members-service
+
+# --- everything (same as Quick start) ---
+docker compose up -d
+```
+
+Managing what's running:
+
+```bash
+docker compose ps                            # what's up
+docker compose logs -f members-service       # follow one service's logs
+docker compose stop members-service          # stop one service (leaves infra running)
+docker compose down                          # stop & remove everything (data survives in the gms_db volume)
+```
+
+> Async services only do work when an API service publishes a task. To exercise `email-worker` /
+> `batch-worker`, bring up the relevant API service alongside it.
 
 ---
 

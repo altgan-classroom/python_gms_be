@@ -7,7 +7,9 @@ existing models and services run unchanged under BOTH Flask (during the
 migration) and FastAPI, and lets Celery workers use a plain session scope
 instead of a Flask app context.
 """
+import contextvars
 import re
+import threading
 from contextlib import contextmanager
 
 import sqlalchemy
@@ -39,7 +41,11 @@ engine = create_engine(
     future=True,
 )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
-session = scoped_session(SessionLocal)
+
+# Sync FastAPI endpoints run on pool threads, so a thread-scoped session outlives the request
+# and keeps a stale transaction. Key by request instead; non-request code falls back to thread.
+request_scope: contextvars.ContextVar = contextvars.ContextVar("gms_db_request_scope", default=None)
+session = scoped_session(SessionLocal, scopefunc=lambda: request_scope.get() or threading.get_ident())
 
 # Declarative base + Flask-SQLAlchemy-style `Model.query` (used ~200x as cls.query)
 # and auto __tablename__.

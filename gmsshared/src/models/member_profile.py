@@ -81,7 +81,6 @@ class MemberProfile(db.Model):
         return results_as_dict
 
     @classmethod
-    # TODO: Change all get to find or vice-versa. Be consistent
     def get_info_by_id(cls, location_id: int, user_id: int) -> Optional[Self]:
         sql = f"""select u.id as member_id, 
                     p.first_name as first_name, 
@@ -190,7 +189,6 @@ class MemberProfile(db.Model):
             params['first_name'] = f"%{name_parts[0]}%"
             params['last_name'] = f"%{name_parts[1]}%"
 
-        # TODO: Delete the payment_status logic from here later after beta
         sql = f"""select concat(p.first_name, ' ', p.last_name) as member_name, 
                     u.email as email,
                     p.first_name as first_name,
