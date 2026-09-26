@@ -21,8 +21,4 @@ export const REPORTS = [
   { id: 'MEMBSESSATT', name: 'Member session attendance', service: 'Operations' },
   { id: 'BASICCHURN', name: 'Recurring member churn', service: 'Sales' },
   { id: 'NETREVENUE', name: 'Net revenue', service: 'Financial' },
-  { id: 'MTDREVENUE', name: 'Month-to-date revenue', service: 'Financial' },
-  { id: 'LASTMONTH', name: 'Last month revenue', service: 'Financial' },
-  { id: 'FORECASTED', name: 'Forecasted revenue', service: 'Financial' },
-  { id: 'BALANCEFUTURECONTRACT', name: 'Balance and future contract value', service: 'Financial' },
 ];
