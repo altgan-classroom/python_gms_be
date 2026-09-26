@@ -140,30 +140,6 @@ class AtRiskAttendance(BaseModel):
     )
 
 
-class NetRevenueReportItem(BaseModel):
-    category: str = Field(..., description="Category of the report")
-    total_revenue_received: float = Field(..., description="Total revenue received")
-    total_refunds_issued: float = Field(..., description="Total refunds issued")
-    tax_taken: float = Field(0.00, description="Tax taken")
-    net_revenue: float | None = Field(None, description="Net Revenue")
-    percentage_total_revenue: int | None = Field(None, description="Percentage Total Revenue")
-
-
-class NetRevenueReport(BaseModel):
-    reports: List[NetRevenueReportItem] = Field(..., description="List of NetRevenue reports")
-
-    @model_validator(mode="after")
-    def validate_net_revenue_report(self) -> Self:
-        if len(self.reports) == 0:
-            return self
-        total_report: NetRevenueReportItem = [report for report in self.reports if report.category == "Total"][0]
-        for report in self.reports:
-            report.percentage_total_revenue = (
-                round((report.net_revenue * 100) / total_report.net_revenue, 2) if total_report.net_revenue else 0.0
-            )
-        return self
-
-
 class MemberPaymentHistoryReport(BaseModel):
     total_revenue_received: float | None = Field(..., description="Net revenue received")
     total_revenue_plans: float | None = Field(..., description="Total revenue plans")
