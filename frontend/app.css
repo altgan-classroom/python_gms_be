@@ -323,6 +323,31 @@ th { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: c
 .inspector-head .count { color: var(--net-muted); margin-right: auto; }
 .inspector button.ghost { color: var(--net-ink); border-color: var(--net-line); }
 .inspector-hint { color: var(--net-muted); margin: 10px 16px; }
+.groups { list-style: none; margin: 0; padding: 0; }
+.group { border-bottom: 1px solid var(--net-line); }
+.group > details > summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: 'act when' 'tally tally';
+  gap: 2px 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--net-muted);
+}
+.group > details > summary::-webkit-details-marker { display: none; }
+.group > details > summary:hover { background: rgb(255 255 255 / 0.05); }
+.group.ok > details > summary { box-shadow: inset 3px 0 0 #6fdc95; }
+.group.fail > details > summary { box-shadow: inset 3px 0 0 #ff8f85; }
+.group .act { grid-area: act; overflow-wrap: anywhere; }
+.group .act::before { content: '\25B8'; display: inline-block; width: 1em; color: var(--net-muted); }
+.group > details[open] > summary .act::before { transform: rotate(90deg); }
+.group .when { grid-area: when; color: var(--net-muted); font-weight: 400; font-family: var(--mono); }
+.group .tally { grid-area: tally; color: var(--net-muted); font-weight: 400; padding-left: 1em; }
+.group.fail .tally { color: #ff8f85; }
+.group .calls { border-top: 1px solid var(--net-line); background: rgb(0 0 0 / 0.18); }
+.group .call:last-child { border-bottom: none; }
 .calls { list-style: none; margin: 0; padding: 0; }
 .call { border-bottom: 1px solid var(--net-line); }
 .call summary {
