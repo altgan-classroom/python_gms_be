@@ -162,7 +162,6 @@ def fill_model(src: Any, dest: Any, exclude: List[str], ignore_nulls: False) -> 
             dest.__setattr__(attr[0], attr[1])
     return dest
 
-#TODO: Stopgap fix! Merge this with fill_model and delete this.
 def copy_model_to_model(src: Any, dest: Any, exclude: List[str]) -> Any:
     exclude.extend(['_sa_instance_state', 'query', 'query_class', 'registry', 'create_datetime', 'update_datetime'])
 

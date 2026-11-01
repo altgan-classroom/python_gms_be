@@ -197,7 +197,6 @@ def get_profile(location_id: int, user_id: int) -> Response:
     )
 
 
-# TODO: Kinda messy. Cleanup after beta
 def create_new_member(location_id: int, body: CreateMemberRequest) -> Response:
     user = User.find_by_email(body.email)
     if user:
@@ -246,7 +245,6 @@ def create_new_member(location_id: int, body: CreateMemberRequest) -> Response:
 
         member_profile.save_and_commit()
 
-        # TODO: Find a better way to return the member_profile object. For now the id should be good
         member_data = row2dict(member_profile, ["id"])
         member_data.pop("user_id")
         member_data["id"] = member_profile.user_id

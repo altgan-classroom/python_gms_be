@@ -17,7 +17,6 @@ def get_location_vendor_info(location: Location):
     if location.door_access and location.door_access_auth_status and location.door_access_vendor_id == DoorAccessVendorEnum.KISI.value:
         api_url = location.door_access_vendor.api_url
         api_key = location.door_access_location_auth[0].field_value
-        # TODO: Make the max_requests and time_window configurable in _ref_door_access_vendor table
         requests = get_client(name=location.id, max_requests = 5, time_window = 1, wait_on_rate_limit = True)
         return api_url, api_key, requests
 

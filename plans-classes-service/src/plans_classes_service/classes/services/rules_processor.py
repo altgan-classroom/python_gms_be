@@ -503,7 +503,6 @@ def rebook_bookings_group(old: Class, new: Class, action):
         raise "Failed to rebook group bookings"
 
 
-# TODO: Consolidate all cancellations (PT and Group) into one method
 def process_cancellations(bookings: List[MemberClass]):
     for booking in bookings:
         booking.member_cancelled_time = datetime.utcnow()
@@ -517,7 +516,6 @@ def _get_by_weekday_classes(old: Class, new: Class):
     # Figure which weekdays we need to filter out
     weekday = ",".join([x for x in old.by_weekday.split(",") if x not in new.by_weekday.split(",")])
 
-    # TODO: Have all this logic in one place. Make the session.events_list method able to handle this and clean this up
     # Convert UTC times to local
     start_time = datetime.combine(new.start_time.date(), old.start_time.time())
     end_time = (
@@ -542,7 +540,6 @@ def _get_by_weekday_classes(old: Class, new: Class):
     return tuple(event_list)
 
 
-# TODO: Consolidate all email sending (PT and Group) into one method
 def send_emails_group(old, new, email_action, changed_attrs):
     bookings = []
     try:
@@ -645,7 +642,6 @@ def send_emails_pt(old, new, email_action, changed_attrs):
     return None
 
 
-# TODO: Consolidate all email sending (PT and Group) into one method
 def process_emails_group(old: Class, new: Class, email_action: int, bookings: List[MemberClass]):
     for booking in bookings:
         # If email sent earlier for this booking, don't spam them again
@@ -779,7 +775,6 @@ def perform_actions(old, new, action, changed_attrs):
             old.add_exdate(new.start_time)
             old.save_and_commit()
             # Special case if changed_attrs are coach or assistant coach
-            # TODO: Move this special case a level above and change the rule processing so that we know if rebooking or cancel
             if not old.private_training and (x in ["main_coach_id", "waitlist"] for x in [y[0] for y in changed_attrs]):
                 rebook_bookings_group(old, new, action)
         elif action == SessionActionTypeEnum.CREATE_NEW_RECURRENCE.value:
@@ -816,7 +811,6 @@ def perform_actions(old, new, action, changed_attrs):
 
             old.save_and_commit()
             # Special case if changed_attrs are coach or assistant coach
-            # TODO: Move this special case a level above and change the rule processing so that we know if rebooking or cancel
             if (
                 not old.private_training
                 and new.id
@@ -846,7 +840,6 @@ def _previous_events_of_recurrence(old, start):
     return old_events
 
 
-# TODO: Consolidate all cancellations (PT and Group) into one method
 def cancel_group(
     location_id: int,
     class_id: int,
@@ -873,7 +866,6 @@ def cancel_group(
     process_emails_group(None, None, SessionChangeEmailTypeEnum.CANCEL.value, bookings)
 
 
-# TODO: Consolidate all cancellations (PT and Group) into one method
 def cancel_pt(
     location_id: int,
     class_id: int,

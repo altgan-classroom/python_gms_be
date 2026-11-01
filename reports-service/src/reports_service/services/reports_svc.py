@@ -36,8 +36,6 @@ from reports_service.dtos.reports_responses import (
     MemberSessionAttendance,
     LocationMembershipCount,
     AtRiskAttendance,
-    NetRevenueReportItem,
-    NetRevenueReport,
     MemberPaymentHistoryReport,
     BalanceAndFutureContractValueReport,
     RecurringMemberChurnReport,
@@ -125,14 +123,13 @@ def _get_sales_report(location_id: int, report: SalesReportTypeEnum, query: Repo
     elif report == SalesReportTypeEnum.NEW_MEMBERSHIP_SALES:
         response = __get_sales_new_sales_report(location_id, query)
     else:
-        # TODO: Move away from this format. Stick to the JSON data=[] format used in every other service.
         response = ReportsResponse(
             status_code=HTTPStatus,
             status=ResponseStatusEnum.NOT_IMPLEMENTED,
             message=f"Sales report {report.value} not implemented yet",
             data=RecordsList.model_validate(
                 {
-                    "reports": [query.model_dump()],
+                    "reports": [query.model_dump(mode="json")],
                     "from_date": query.report_date_from,
                     "to_date": query.report_date_to,
                 },
@@ -234,7 +231,7 @@ def _get_operations_report(location_id: int, report: OperationsReportTypeEnum, q
             message=f"Operations report {report.value} not implemented yet",
             data=RecordsList.model_validate(
                 {
-                    "reports": [query.model_dump()],
+                    "reports": [query.model_dump(mode="json")],
                     "from_date": query.report_date_from,
                     "to_date": query.report_date_to,
                 },
@@ -373,7 +370,6 @@ def __get_at_risk_attendance(location_id: int, query: ReportsQuery) -> ReportsRe
         last_sunday_at_midnite = last_sunday.replace(hour=0, minute=0, second=0, microsecond=0)
         return to_utc(last_sunday_at_midnite)
 
-    # TODO: Clean this shit up. Use the validators or decorator functions
     def reports_time_to_local(at_risk_reports: List[dict]) -> None:
         for i in range(len(at_risk_reports)):
             last_attended: str | None = at_risk_reports[i]["last_attended_date"]
@@ -401,7 +397,6 @@ def __get_at_risk_attendance(location_id: int, query: ReportsQuery) -> ReportsRe
             {"reports": reports, "from_date": from_date, "to_date": datetime.utcnow()},
             from_attributes=True,
         )
-        # TODO: Remove to_location_time to to_local eventually
         response = ReportsResponse(
             status_code=HTTPStatus.OK,
             status=ResponseStatusEnum.FOUND,
@@ -541,9 +536,7 @@ def __get_challenge_conversions_cohort_summary(location_id: int, query: ReportsQ
 
 def _get_financial_report(location_id: int, report: FinancialReportTypeEnum, query: ReportsQuery) -> Response:
     response: ReportsResponse
-    if report == FinancialReportTypeEnum.NET_REVENUE:
-        response = __get_financial_net_revenue_report(location_id, query)
-    elif report == FinancialReportTypeEnum.MTD_REVENUE:
+    if report == FinancialReportTypeEnum.MTD_REVENUE:
         response = __get_financial_month_to_date_report(location_id)
     elif report == FinancialReportTypeEnum.LAST_MONTH_REVENUE:
         response = __get_financial_last_month_report(location_id)
@@ -558,7 +551,7 @@ def _get_financial_report(location_id: int, report: FinancialReportTypeEnum, que
             message=f"Financial report {report.value} not implemented yet",
             data=RecordsList.model_validate(
                 {
-                    "reports": [query.model_dump()],
+                    "reports": [query.model_dump(mode="json")],
                     "from_date": query.report_date_from,
                     "to_date": query.report_date_to,
                 },
@@ -566,39 +559,6 @@ def _get_financial_report(location_id: int, report: FinancialReportTypeEnum, que
             ),
         )
     return create_response(**response.model_dump())
-
-
-@check_access(roles=["OWNER", "MANAGER"])
-def __get_financial_net_revenue_report(location_id: int, query: ReportsQuery) -> ReportsResponse:
-    from_date: datetime = query.report_date_from
-    to_date: datetime = query.report_date_to
-    finances: List[dict] = Report.net_revenue_report(location_id, from_date, to_date)
-    if len(finances) > 0:
-        net_revenue_report: NetRevenueReport = NetRevenueReport(
-            reports=[NetRevenueReportItem.model_validate(sale, from_attributes=True) for sale in finances]
-        )
-        reports = [net_revenue.model_dump() for net_revenue in net_revenue_report.reports]
-        response = ReportsResponse(
-            status_code=HTTPStatus.OK,
-            status=ResponseStatusEnum.FOUND,
-            message=f"Financial Net Revenue Report: {len(reports)} records found",
-            data=RecordsList.model_validate(
-                {
-                    "reports": reports,
-                    "from_date": query.report_date_from,
-                    "to_date": query.report_date_to,
-                },
-                from_attributes=True,
-            ),
-        )
-    else:
-        response = ReportsResponse(
-            status_code=HTTPStatus.OK,
-            status=ResponseStatusEnum.NOT_FOUND,
-            message="Financial Net Revenue Report: no records found",
-            data=None,
-        )
-    return response
 
 
 @check_access(roles=["OWNER", "MANAGER"])

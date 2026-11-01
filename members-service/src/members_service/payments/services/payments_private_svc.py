@@ -103,7 +103,7 @@ def onboard_member_to_payrix_info(location_id: int, member_id: int) -> Response:
 def create_payment_method_info_card(location_id: int, user_id: int, body: CreatePaymentMethodRequest) -> Response:
 
     payment_method = MemberPaymentMethod(location_id=location_id, member_id=user_id)
-    body.method = 2  # TODO: Could be 1, 2, 3, 4, 5. Need to find a way to get this properly. But for now 2 seems to work for all types
+    body.method = 2
     if body.zipcode and not body.token:
         payment_method.zipcode = body.zipcode
         payment_method.payrix_zipcode_onboarding_status = PayrixOnboardStatusEnum.QUEUED.value
@@ -622,7 +622,6 @@ def _forgive_payment(payment: MemberPaymentHistory_v2):
     if payment.payrix_transaction_status == PayrixTransactionStatusEnum.FAILED.value:
         payment.payrix_transaction_status = PayrixTransactionStatusEnum.FORGIVEN.value
         payment.save_and_commit()
-        # TODO: Create a writeoff / creditmemo invoice and add appropriate ledger entries? Check with Maggie and Chris
         payment_status_data = PaymentStatusResponse.model_validate(payment, from_attributes=True).model_dump()
         return create_response(
             status_code=HTTPStatus.OK,
